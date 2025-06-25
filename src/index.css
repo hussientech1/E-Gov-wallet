@@ -1,0 +1,149 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Government-themed color palette */
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    /* Deep blue for primary actions - government theme */
+    --primary: 215 75% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Light blue for secondary elements */
+    --secondary: 215 30% 92%;
+    --secondary-foreground: 215 75% 38%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 25% 46.9%;
+
+    /* Subtle accent color */
+    --accent: 215 30% 92%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Success color for approved status */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning color for pending status */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 215 75% 38%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 215 30% 96%;
+    --sidebar-foreground: 215 75% 20%;
+    --sidebar-primary: 215 75% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 30% 92%;
+    --sidebar-accent-foreground: 215 75% 38%;
+    --sidebar-border: 215 30% 91%;
+    --sidebar-ring: 215 75% 60%;
+  }
+
+  .dark {
+    /* Dark mode theme colors */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 215 30% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Deep blue adjusted for dark mode */
+    --primary: 215 75% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Success color for dark mode */
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning color for dark mode */
+    --warning: 38 92% 60%;
+    --warning-foreground: 0 0% 0%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 215 75% 60%;
+
+    --sidebar-background: 215 30% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 215 75% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 30% 16%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 30% 18%;
+    --sidebar-ring: 215 75% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-1;
+  }
+
+  .status-badge-pending {
+    @apply bg-warning/[0.2] text-warning-foreground border border-warning/[0.3] px-2 py-0.5 rounded-md text-sm inline-flex items-center gap-1;
+  }
+
+  .status-badge-approved {
+    @apply bg-success/[0.2] text-success-foreground border border-success/[0.3] px-2 py-0.5 rounded-md text-sm inline-flex items-center gap-1;
+  }
+
+  .status-badge-rejected {
+    @apply bg-destructive/[0.2] text-destructive-foreground border border-destructive/[0.3] px-2 py-0.5 rounded-md text-sm inline-flex items-center gap-1;
+  }
+
+  .bottom-nav-item {
+    @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors;
+  }
+  
+  .bottom-nav-item.active {
+    @apply text-primary bg-primary/[0.1];
+  }
+  
+  .bottom-nav-item:not(.active) {
+    @apply text-muted-foreground hover:text-foreground hover:bg-accent;
+  }
+}

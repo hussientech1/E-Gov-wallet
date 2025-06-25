@@ -1,0 +1,625 @@
+
+-- Drop the overloaded register_user functions first by specifying their parameter types
+DROP FUNCTION IF EXISTS public.register_user(character varying, character varying, character varying, text);
+DROP FUNCTION IF EXISTS public.register_user(character varying, character varying, character varying, text, character varying, character varying, character varying, character varying);
+
+-- First drop all functions that depend on the tables
+DROP FUNCTION IF EXISTS public.get_user_notifications;
+DROP FUNCTION IF EXISTS public.get_user_documents;
+DROP FUNCTION IF EXISTS public.admin_review_application;
+DROP FUNCTION IF EXISTS public.get_admin_applications;
+DROP FUNCTION IF EXISTS public.submit_service_application;
+DROP FUNCTION IF EXISTS public.mark_notification_read;
+DROP FUNCTION IF EXISTS public.handle_auth_login;
+DROP FUNCTION IF EXISTS public.custom_login;
+DROP FUNCTION IF EXISTS public.admin_login;
+DROP FUNCTION IF EXISTS public.get_services;
+
+-- Now drop tables with CASCADE to ensure all dependencies are removed
+DROP TABLE IF EXISTS public.support_requests CASCADE;
+DROP TABLE IF EXISTS public.service_applications CASCADE;
+DROP TABLE IF EXISTS public.notifications CASCADE;
+DROP TABLE IF EXISTS public.user_documents CASCADE;
+DROP TABLE IF EXISTS public.password_reset_tokens CASCADE;
+DROP TABLE IF EXISTS public.admin_logs CASCADE;
+DROP TABLE IF EXISTS public.admin_users CASCADE;
+DROP TABLE IF EXISTS public.services CASCADE;
+DROP TABLE IF EXISTS public.users CASCADE;
+
+-- Drop enum types after dropping tables that use them
+DROP TYPE IF EXISTS public.document_status;
+DROP TYPE IF EXISTS public.document_type;
+DROP TYPE IF EXISTS public.doc_type;
+
+-- Create enum types
+CREATE TYPE public.document_status AS ENUM ('active', 'expired', 'pending', 'cancelled');
+CREATE TYPE public.document_type AS ENUM ('passport', 'national_id', 'birth_certificate', 'driver_license');
+CREATE TYPE public.doc_type AS ENUM ('passport', 'id_card', 'birth_certificate', 'marriage_certificate');
+
+-- Create users table
+CREATE TABLE public.users (
+  national_number VARCHAR PRIMARY KEY,
+  full_name VARCHAR NOT NULL,
+  password_hash TEXT NOT NULL,
+  phone_number VARCHAR NOT NULL,
+  email VARCHAR,
+  gender VARCHAR,
+  address TEXT,
+  state VARCHAR,
+  birth_date DATE,
+  profile_completed BOOLEAN DEFAULT FALSE,
+  dark_mode_enabled BOOLEAN DEFAULT FALSE,
+  language_preference VARCHAR DEFAULT 'en',
+  profile_picture TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create services table
+CREATE TABLE public.services (
+  service_id SERIAL PRIMARY KEY,
+  service_name VARCHAR NOT NULL,
+  description TEXT,
+  fee NUMERIC,
+  required_documents TEXT[],
+  processing_time VARCHAR,
+  is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Create admin_users table
+CREATE TABLE public.admin_users (
+  admin_id SERIAL PRIMARY KEY,
+  username VARCHAR NOT NULL,
+  password VARCHAR NOT NULL,
+  full_name VARCHAR NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create admin_logs table
+CREATE TABLE public.admin_logs (
+  log_id SERIAL PRIMARY KEY,
+  admin_username VARCHAR NOT NULL,
+  action TEXT NOT NULL,
+  ip_address VARCHAR NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Create password_reset_tokens table
+CREATE TABLE public.password_reset_tokens (
+  token_id SERIAL PRIMARY KEY,
+  national_number VARCHAR REFERENCES public.users(national_number),
+  token VARCHAR NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create user_documents table
+CREATE TABLE public.user_documents (
+  doc_id SERIAL PRIMARY KEY,
+  national_number VARCHAR REFERENCES public.users(national_number),
+  doc_type document_type NOT NULL,
+  doc_number VARCHAR NOT NULL,
+  issue_date DATE NOT NULL,
+  expiry_date DATE,
+  document_status document_status DEFAULT 'active',
+  qr_code TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create notifications table
+CREATE TABLE public.notifications (
+  notification_id SERIAL PRIMARY KEY,
+  national_number VARCHAR REFERENCES public.users(national_number),
+  title VARCHAR NOT NULL,
+  message TEXT NOT NULL,
+  status_type VARCHAR,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create service_applications table
+CREATE TABLE public.service_applications (
+  application_id SERIAL PRIMARY KEY,
+  national_number VARCHAR REFERENCES public.users(national_number),
+  service_id INTEGER REFERENCES public.services(service_id),
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at TIMESTAMP,
+  reviewed_by VARCHAR,
+  application_status VARCHAR DEFAULT 'Pending',
+  payment_status VARCHAR DEFAULT 'Unpaid',
+  invoice_number VARCHAR NOT NULL,
+  office_location VARCHAR NOT NULL,
+  emergency_reason TEXT,
+  rejection_reason TEXT
+);
+
+-- Create support_requests table
+CREATE TABLE public.support_requests (
+  request_id SERIAL PRIMARY KEY,
+  national_number VARCHAR REFERENCES public.users(national_number),
+  subject VARCHAR,
+  message TEXT,
+  status VARCHAR DEFAULT 'Open',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert initial sample data
+-- Add some sample services
+INSERT INTO public.services (service_name, description, fee, processing_time, required_documents, is_active) 
+VALUES 
+  ('Passport Application', 'Apply for a new passport or renew an existing one', 2500, '10-15 business days', ARRAY['National ID', 'Birth Certificate', 'Proof of Address'], TRUE),
+  ('National ID Application', 'Apply for a national identification card', 1000, '5-7 business days', ARRAY['Birth Certificate', 'Proof of Address'], TRUE),
+  ('Birth Certificate', 'Request a birth certificate', 500, '3-5 business days', ARRAY['Hospital Records', 'Parents'' IDs'], TRUE),
+  ('Driver License', 'Apply for a new driver license or renew an existing one', 1500, '7-10 business days', ARRAY['National ID', 'Driving Test Results'], TRUE);
+
+-- Add an admin user (username: admin, password: admin123)
+INSERT INTO public.admin_users (username, password, full_name) 
+VALUES ('admin', 'admin123', 'System Administrator');
+
+-- Recreate database functions
+CREATE OR REPLACE FUNCTION public.custom_login(p_national_number character varying, p_password text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+  v_user public.users%ROWTYPE;
+  v_result JSONB;
+BEGIN
+  -- Try to find the user
+  SELECT * INTO v_user 
+  FROM public.users 
+  WHERE national_number = p_national_number;
+  
+  -- Check if user exists and password matches
+  IF v_user.national_number IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'message', 'Invalid credentials');
+  END IF;
+  
+  IF v_user.password_hash <> p_password THEN -- In a real app, proper password verification
+    RETURN jsonb_build_object('success', false, 'message', 'Invalid credentials');
+  END IF;
+  
+  -- Login successful
+  RETURN jsonb_build_object(
+    'success', true, 
+    'message', 'Login successful',
+    'full_name', v_user.full_name,
+    'national_number', v_user.national_number
+  );
+EXCEPTION
+  WHEN OTHERS THEN
+    RETURN jsonb_build_object('success', false, 'message', SQLERRM);
+END;
+$function$;
+
+-- Handle Auth Login Function
+CREATE OR REPLACE FUNCTION public.handle_auth_login(p_national_number character varying, p_password text)
+ RETURNS json
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_user RECORD;
+    v_response JSON;
+BEGIN
+    -- Find user by national number
+    SELECT * INTO v_user FROM public.users 
+    WHERE national_number = p_national_number;
+    
+    -- Check if user exists and password matches
+    IF v_user.national_number IS NULL THEN
+        RETURN json_build_object('success', false, 'message', 'Invalid credentials');
+    END IF;
+    
+    IF v_user.password_hash != p_password THEN
+        RETURN json_build_object('success', false, 'message', 'Invalid credentials');
+    END IF;
+    
+    -- Return user data
+    RETURN json_build_object(
+        'success', true,
+        'user', json_build_object(
+            'id', v_user.national_number, 
+            'fullName', v_user.full_name,
+            'nationalNumber', v_user.national_number,
+            'isProfileComplete', v_user.profile_completed
+        )
+    );
+END;
+$function$;
+
+-- Register User Function (full version with all parameters)
+CREATE OR REPLACE FUNCTION public.register_user(
+  p_national_number character varying, 
+  p_full_name character varying, 
+  p_phone_number character varying, 
+  p_password text,
+  p_gender character varying DEFAULT NULL, 
+  p_state character varying DEFAULT NULL, 
+  p_address character varying DEFAULT NULL, 
+  p_email character varying DEFAULT NULL
+)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+  user_exists BOOLEAN;
+  v_result JSONB;
+BEGIN
+  -- Check if user already exists
+  SELECT EXISTS (
+    SELECT 1 FROM public.users WHERE national_number = p_national_number
+  ) INTO user_exists;
+  
+  IF user_exists THEN
+    RETURN jsonb_build_object('success', false, 'message', 'User already exists');
+  END IF;
+  
+  -- Insert new user with additional fields
+  INSERT INTO public.users (
+    national_number, 
+    full_name, 
+    phone_number, 
+    password_hash,
+    gender,
+    state,
+    address,
+    email,
+    profile_completed
+  ) VALUES (
+    p_national_number,
+    p_full_name,
+    p_phone_number,
+    p_password, -- In a real app, this would be properly hashed
+    p_gender,
+    p_state,
+    p_address,
+    p_email,
+    true -- Since we're collecting all info now
+  );
+  
+  RETURN jsonb_build_object('success', true, 'message', 'User registered successfully');
+EXCEPTION
+  WHEN OTHERS THEN
+    RETURN jsonb_build_object('success', false, 'message', SQLERRM);
+END;
+$function$;
+
+-- Admin Login Function
+CREATE OR REPLACE FUNCTION public.admin_login(p_username character varying, p_password character varying)
+ RETURNS json
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_admin RECORD;
+BEGIN
+    SELECT * INTO v_admin
+    FROM public.admin_users
+    WHERE username = p_username
+    AND password = p_password
+    AND is_active = true;
+    
+    IF v_admin.admin_id IS NULL THEN
+        RETURN json_build_object('success', false, 'message', 'Invalid credentials');
+    END IF;
+    
+    RETURN json_build_object(
+        'success', true,
+        'admin', json_build_object(
+            'adminId', v_admin.admin_id,
+            'username', v_admin.username,
+            'fullName', v_admin.full_name
+        )
+    );
+END;
+$function$;
+
+-- Get User Documents Function
+CREATE OR REPLACE FUNCTION public.get_user_documents(p_national_number character varying)
+ RETURNS SETOF user_documents
+ LANGUAGE sql
+ SECURITY DEFINER
+AS $function$
+    SELECT * FROM public.user_documents 
+    WHERE national_number = p_national_number
+    ORDER BY created_at DESC;
+$function$;
+
+-- Get User Notifications Function
+CREATE OR REPLACE FUNCTION public.get_user_notifications(p_national_number character varying)
+ RETURNS SETOF notifications
+ LANGUAGE sql
+ SECURITY DEFINER
+AS $function$
+    SELECT * FROM public.notifications 
+    WHERE national_number = p_national_number
+    ORDER BY created_at DESC;
+$function$;
+
+-- Mark Notification Read Function
+CREATE OR REPLACE FUNCTION public.mark_notification_read(p_notification_id integer, p_national_number character varying)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+    UPDATE public.notifications
+    SET is_read = true
+    WHERE notification_id = p_notification_id
+    AND national_number = p_national_number;
+    
+    RETURN FOUND;
+END;
+$function$;
+
+-- Get Services Function
+CREATE OR REPLACE FUNCTION public.get_services()
+ RETURNS SETOF services
+ LANGUAGE sql
+ SECURITY DEFINER
+AS $function$
+    SELECT * FROM public.services WHERE is_active = true;
+$function$;
+
+-- Submit Service Application Function
+CREATE OR REPLACE FUNCTION public.submit_service_application(
+  p_national_number character varying, 
+  p_service_id integer, 
+  p_invoice_number character varying, 
+  p_office_location character varying, 
+  p_is_emergency boolean, 
+  p_emergency_reason text DEFAULT NULL
+)
+ RETURNS json
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_application_id INTEGER;
+BEGIN
+    -- Insert application
+    INSERT INTO public.service_applications (
+        national_number,
+        service_id,
+        invoice_number,
+        office_location,
+        emergency_reason
+    ) VALUES (
+        p_national_number,
+        p_service_id,
+        p_invoice_number,
+        p_office_location,
+        CASE WHEN p_is_emergency THEN p_emergency_reason ELSE NULL END
+    ) RETURNING application_id INTO v_application_id;
+    
+    -- Create notification for the user
+    INSERT INTO public.notifications (
+        national_number,
+        title,
+        message,
+        status_type
+    ) VALUES (
+        p_national_number,
+        'Application Submitted',
+        'Your service application has been submitted and is pending review.',
+        'pending'
+    );
+    
+    -- Return success
+    RETURN json_build_object(
+        'success', true,
+        'applicationId', v_application_id,
+        'message', 'Application submitted successfully'
+    );
+END;
+$function$;
+
+-- Get Admin Applications Function
+CREATE OR REPLACE FUNCTION public.get_admin_applications(
+  p_status character varying DEFAULT NULL, 
+  p_service_id integer DEFAULT NULL, 
+  p_offset integer DEFAULT 0, 
+  p_limit integer DEFAULT 20
+)
+ RETURNS TABLE(
+  application_id integer, 
+  national_number character varying, 
+  service_id integer, 
+  service_name character varying, 
+  submitted_at timestamp without time zone, 
+  reviewed_at timestamp without time zone, 
+  application_status character varying, 
+  payment_status character varying, 
+  office_location character varying, 
+  invoice_number character varying, 
+  emergency_reason text, 
+  rejection_reason text, 
+  reviewed_by character varying, 
+  full_name character varying
+)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        sa.application_id,
+        sa.national_number,
+        sa.service_id,
+        s.service_name,
+        sa.submitted_at,
+        sa.reviewed_at,
+        sa.application_status,
+        sa.payment_status,
+        sa.office_location,
+        sa.invoice_number,
+        sa.emergency_reason,
+        sa.rejection_reason,
+        sa.reviewed_by,
+        u.full_name
+    FROM 
+        public.service_applications sa
+    JOIN 
+        public.services s ON sa.service_id = s.service_id
+    JOIN 
+        public.users u ON sa.national_number = u.national_number
+    WHERE
+        (p_status IS NULL OR sa.application_status = p_status) AND
+        (p_service_id IS NULL OR sa.service_id = p_service_id)
+    ORDER BY 
+        CASE WHEN sa.application_status = 'Pending' THEN 0 ELSE 1 END,
+        sa.submitted_at DESC
+    OFFSET p_offset
+    LIMIT p_limit;
+END;
+$function$;
+
+-- Admin Review Application Function
+CREATE OR REPLACE FUNCTION public.admin_review_application(
+  p_admin_username character varying, 
+  p_application_id integer, 
+  p_approve boolean, 
+  p_rejection_reason text DEFAULT NULL
+)
+ RETURNS json
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+    v_application RECORD;
+    v_service_name VARCHAR;
+    v_national_number VARCHAR;
+    v_doc_type doc_type;
+    v_doc_id INTEGER;
+    v_current_date DATE := CURRENT_DATE;
+    v_expiry_date DATE;
+BEGIN
+    -- Get application
+    SELECT * INTO v_application 
+    FROM public.service_applications 
+    WHERE application_id = p_application_id;
+    
+    IF v_application.application_id IS NULL THEN
+        RETURN json_build_object('success', false, 'message', 'Application not found');
+    END IF;
+    
+    v_national_number := v_application.national_number;
+    
+    -- Get service name
+    SELECT service_name INTO v_service_name 
+    FROM public.services 
+    WHERE service_id = v_application.service_id;
+    
+    -- Update application status
+    UPDATE public.service_applications
+    SET 
+        application_status = CASE WHEN p_approve THEN 'Approved' ELSE 'Rejected' END,
+        reviewed_at = NOW(),
+        reviewed_by = p_admin_username,
+        rejection_reason = CASE WHEN NOT p_approve THEN p_rejection_reason ELSE NULL END
+    WHERE application_id = p_application_id;
+    
+    -- Log admin action
+    INSERT INTO public.admin_logs (
+        admin_username,
+        action,
+        ip_address
+    ) VALUES (
+        p_admin_username,
+        CASE WHEN p_approve 
+            THEN 'Approved application #' || p_application_id 
+            ELSE 'Rejected application #' || p_application_id 
+        END,
+        '127.0.0.1' -- In production, this would be the actual IP
+    );
+    
+    -- Create notification for user
+    INSERT INTO public.notifications (
+        national_number,
+        title,
+        message,
+        status_type
+    ) VALUES (
+        v_national_number,
+        CASE WHEN p_approve 
+            THEN 'Application Approved' 
+            ELSE 'Application Rejected' 
+        END,
+        CASE WHEN p_approve 
+            THEN 'Your ' || v_service_name || ' application has been approved.'
+            ELSE 'Your ' || v_service_name || ' application has been rejected. Reason: ' || p_rejection_reason
+        END,
+        CASE WHEN p_approve THEN 'approved' ELSE 'rejected' END
+    );
+    
+    -- If approved, create document
+    IF p_approve THEN
+        -- Determine doc_type based on service
+        CASE 
+            WHEN v_service_name ILIKE '%passport%' THEN
+                v_doc_type := 'passport'::doc_type;
+                v_expiry_date := v_current_date + INTERVAL '10 years';
+            WHEN v_service_name ILIKE '%id card%' OR v_service_name ILIKE '%national id%' THEN
+                v_doc_type := 'id_card'::doc_type;
+                v_expiry_date := v_current_date + INTERVAL '5 years';
+            WHEN v_service_name ILIKE '%birth%' THEN
+                v_doc_type := 'birth_certificate'::doc_type;
+                v_expiry_date := NULL; -- No expiry for birth certificates
+            WHEN v_service_name ILIKE '%marriage%' THEN
+                v_doc_type := 'marriage_certificate'::doc_type;
+                v_expiry_date := NULL; -- No expiry for marriage certificates
+            ELSE
+                v_doc_type := 'id_card'::doc_type;
+                v_expiry_date := v_current_date + INTERVAL '5 years';
+        END CASE;
+        
+        -- Generate a unique document number based on type and date
+        INSERT INTO public.user_documents (
+            national_number,
+            doc_type,
+            doc_number,
+            issue_date,
+            expiry_date,
+            document_status,
+            qr_code
+        ) VALUES (
+            v_national_number,
+            v_doc_type,
+            UPPER(SUBSTRING(v_doc_type::text, 1, 2)) || '-' || 
+                TO_CHAR(v_current_date, 'YYMMDD') || '-' || 
+                LPAD(FLOOR(RANDOM() * 10000)::text, 4, '0'),
+            v_current_date,
+            v_expiry_date,
+            'active'::document_status,
+            'https://verify.jahiezz.gov/' || v_application.application_id
+        ) RETURNING doc_id INTO v_doc_id;
+        
+        -- Notify about new document
+        INSERT INTO public.notifications (
+            national_number,
+            title,
+            message,
+            status_type
+        ) VALUES (
+            v_national_number,
+            'New Document Available',
+            'Your new ' || v_doc_type::text || ' is now available in your document wallet.',
+            'approved'
+        );
+    END IF;
+    
+    -- Return result
+    RETURN json_build_object(
+        'success', true,
+        'message', CASE WHEN p_approve 
+                     THEN 'Application approved. Document created.' 
+                     ELSE 'Application rejected.' 
+                   END,
+        'docId', v_doc_id
+    );
+END;
+$function$;

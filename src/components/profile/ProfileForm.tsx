@@ -1,0 +1,120 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from "@/components/ui/use-toast";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from "@/integrations/supabase/client";
+import { Phone, Save, AlertTriangle } from 'lucide-react';
+
+interface ProfileFormProps {
+  userProfile: {
+    phone_number: string;
+    profile_picture?: string | null;
+    national_number: string;
+  };
+  profilePicture: string | null;
+  setProfilePicture: (url: string | null) => void;
+}
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ 
+  userProfile,
+  profilePicture,
+  setProfilePicture
+}) => {
+  const { t } = useLanguage();
+  const [phoneNumber, setPhoneNumber] = useState(userProfile.phone_number || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userProfile) return;
+
+    setIsSaving(true);
+    setSaveSuccess(false);
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          phone_number: phoneNumber,
+          profile_picture: profilePicture
+        })
+        .eq('national_number', userProfile.national_number);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        toast({
+          title: t('error'),
+          description: t('errorUpdatingProfile'),
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setSaveSuccess(true);
+      toast({
+        title: t('success'),
+        description: t('profileUpdateSuccess'),
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: t('error'),
+        description: t('somethingWentWrong'),
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="space-y-4">
+        <h2 className="text-lg font-medium">{t('contactInformation')}</h2>
+        
+        <div>
+          <Label htmlFor="phoneNumber">{t('phoneNumber')}</Label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="phoneNumber"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        
+        <div className="bg-warning/10 border border-warning/30 rounded-md p-3 flex gap-3 items-start">
+          <AlertTriangle className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+          <p className="text-sm">
+            {t('profileUpdateNote')}
+          </p>
+        </div>
+        
+        {saveSuccess && (
+          <div className="bg-success/10 border border-success/30 rounded-md p-3 text-center">
+            <p className="text-success">{t('profileUpdateSuccess')}</p>
+          </div>
+        )}
+        
+        <Button type="submit" className="w-full" disabled={isSaving}>
+          {isSaving ? (
+            <>{t('saving')}...</>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              {t('saveChanges')}
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+export default ProfileForm;

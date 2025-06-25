@@ -1,0 +1,214 @@
+
+# SUDAN E-GOV DIGITAL WALLET - PROJECT DOCUMENTATION
+
+## Project Overview
+
+This project is a digital wallet application for Sudan's e-government services, allowing citizens to manage their digital identity documents, apply for government services, and track their applications. The application provides both citizen and admin interfaces with secure authentication.
+
+## Key Features
+
+- Digital document management (ID cards, passports)
+- Service application and tracking
+- Profile management
+- Admin dashboard for document approval and management
+- Multi-language support (English/Arabic)
+- Dark/light mode theme support
+- Responsive design for mobile and desktop
+
+## Project Architecture
+
+The project follows a standard React application architecture built with Vite, TypeScript, Tailwind CSS, and Shadcn UI components. The backend functionality is powered by Supabase, with custom Edge Functions for specialized operations.
+
+## Core Files and Directories
+
+### Root Files
+
+- `index.html` - The entry point HTML file containing the root element and script imports
+- `vite.config.ts` - Vite configuration for the project build process
+- `tailwind.config.ts` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+
+### Source Code Structure
+
+#### Main Application Files
+
+- `src/main.tsx` - Application bootstrapper that renders the root React component
+- `src/App.tsx` - Main application component defining the routing structure
+  - Contains route definitions for protected/public routes
+  - Wraps the application in necessary providers (Auth, Theme, Language, QueryClient)
+
+#### Context Providers
+
+- `src/contexts/AuthContext.tsx` - Authentication context provider
+  - Manages user authentication state
+  - Provides login/logout functionality
+  - Handles admin authentication
+  - Connects with Supabase auth functions
+
+- `src/contexts/ThemeContext.tsx` - Theme context provider
+  - Controls light/dark mode switching
+  - Persists theme preferences in localStorage
+
+- `src/contexts/LanguageContext.tsx` - Language context provider
+  - Handles internationalization (English/Arabic)
+  - Provides translation functions
+  - Stores language preference in localStorage
+
+#### Pages
+
+- `src/pages/Login.tsx` - User login page
+- `src/pages/AdminLogin.tsx` - Admin login page
+- `src/pages/SignUp.tsx` - User registration page
+- `src/pages/Home.tsx` - Dashboard/home page
+- `src/pages/Documents.tsx` - Document listing and management
+- `src/pages/DocumentDetail.tsx` - Individual document view
+- `src/pages/Services.tsx` - Service application page
+- `src/pages/Profile.tsx` - User profile management
+- `src/pages/Settings.tsx` - Application settings
+- `src/pages/Admin.tsx` - Admin dashboard
+- `src/pages/NotFound.tsx` - 404 error page
+- `src/pages/Index.tsx` - Router entry point that redirects based on auth status
+
+#### Components
+
+##### Layout Components
+- `src/components/layout/AppLayout.tsx` - Main layout wrapper component
+- `src/components/layout/BottomNavigation.tsx` - Mobile navigation bar
+- `src/components/layout/PageHeader.tsx` - Consistent page header component
+
+##### Authentication Components
+- `src/components/auth/NationalNumberInput.tsx` - Specialized input for national IDs
+- `src/components/auth/PasswordInput.tsx` - Password field with show/hide toggle
+
+##### Document Components
+- `src/components/documents/DocumentCard.tsx` - Document preview card
+- `src/components/documents/DocumentInfo.tsx` - Document details display
+- `src/components/documents/DocumentActions.tsx` - Action buttons for documents
+- `src/components/documents/DocumentForm.tsx` - Form for editing documents
+- `src/components/documents/DocumentQRCode.tsx` - QR code generator
+- `src/components/documents/DocumentSkeleton.tsx` - Loading state for documents
+- `src/components/documents/DocumentDetailSkeleton.tsx` - Loading state for document detail
+- `src/components/documents/DocumentError.tsx` - Error state for document operations
+
+##### Service Components
+- `src/components/services/ServiceForm.tsx` - Form for applying to services
+- `src/components/services/ServiceTypeSelect.tsx` - Service category selector
+- `src/components/services/OfficeSelect.tsx` - Government office location selector
+- `src/components/services/UserConfirmation.tsx` - User information confirmation
+- `src/components/services/EmergencySection.tsx` - UI for emergency service requests
+- `src/components/services/ExecutionTypeToggle.tsx` - Regular/expedited service toggle
+
+##### Profile Components
+- `src/components/profile/ProfileForm.tsx` - User profile edit form
+- `src/components/profile/AvatarUpload.tsx` - Profile picture upload component
+- `src/components/profile/UserInfoDisplay.tsx` - Read-only user information
+- `src/components/profile/ProfileSkeleton.tsx` - Loading state for profile
+
+##### Admin Components
+- `src/components/admin/AdminDashboard.tsx` - Admin home screen
+- `src/components/admin/AdminApplications.tsx` - Service application management
+- `src/components/admin/AdminDocuments.tsx` - Document management
+- `src/components/admin/AdminUsers.tsx` - User management
+- `src/components/admin/AdminSettings.tsx` - Admin settings
+- `src/components/admin/AdminLogs.tsx` - Activity logs
+- `src/components/admin/applications/ApplicationsTable.tsx` - Table for viewing applications
+- `src/components/admin/applications/RejectionDialog.tsx` - Dialog for rejecting applications
+
+##### UI Components
+- `src/components/ui/*` - Shadcn UI component library
+  - Button, Input, Card, Dialog, Form, Toast, etc.
+  - These are based on Radix UI primitives with Tailwind styling
+
+#### Type Definitions
+
+- `src/types/document.ts` - Document type definitions
+- `src/types/application.ts` - Service application type definitions
+- `src/types/index.ts` - Re-exports from type files
+
+#### Utility Functions
+
+- `src/utils/adminUtils.ts` - Admin functionality utilities
+- `src/utils/applicationUtils.ts` - Service application utilities
+- `src/utils/applicationApprovalUtils.ts` - Application approval utilities
+
+#### Supabase Integration
+
+- `src/integrations/supabase/client.ts` - Supabase client configuration
+- `src/integrations/supabase/admin-client.ts` - Admin-specific Supabase client
+- `src/integrations/supabase/types.ts` - Supabase type definitions
+
+#### Supabase Edge Functions
+
+- `supabase/functions/update_register_user/index.ts` - User registration function
+- `supabase/functions/set_claim/index.ts` - Function for setting user JWT claims
+- `supabase/config.toml` - Edge Functions configuration
+
+## Key File Relationships
+
+### Authentication Flow
+- `Login.tsx` → `AuthContext.tsx` → Supabase RPC `custom_login` → User data → Protected routes
+- `SignUp.tsx` → Supabase Function `update_register_user` → User registration → `Login.tsx`
+- `AdminLogin.tsx` → `AuthContext.tsx` → `admin_users` table → Admin dashboard
+
+### Document Management
+- `Documents.tsx` → Document listing from Supabase → `DocumentCard.tsx`
+- `DocumentDetail.tsx` → Document data from Supabase → `DocumentInfo.tsx`, `DocumentQRCode.tsx`
+- `DocumentForm.tsx` → Edit document → Supabase update
+
+### Service Application Flow
+- `Services.tsx` → `ServiceForm.tsx` → `ServiceTypeSelect.tsx`, `OfficeSelect.tsx` → Supabase service_applications
+
+### Common UI Flow
+- `App.tsx` → `AppLayout.tsx` → Page components → UI components
+
+## Data Models
+
+### Key Database Tables
+- `users` - User accounts and profile data
+- `user_documents` - Digital documents owned by users
+- `services` - Available government services
+- `service_applications` - User applications for services
+- `notifications` - System notifications for users
+- `admin_users` - Admin account information
+- `admin_logs` - Admin activity tracking
+
+### State Management
+- Authentication state - Managed by AuthContext
+- Theme state - Managed by ThemeContext
+- Language state - Managed by LanguageContext
+- Data fetching - Managed by TanStack Query
+
+## Core Features Implementation
+
+### Multi-language Support
+- Uses a context-based approach with `LanguageContext.tsx`
+- Translations stored in a static object
+- Components access translations via `useLanguage()` hook and `t()` function
+
+### Theming System
+- Light/dark mode managed by `ThemeContext.tsx`
+- Theme preference stored in localStorage
+- Applied via Tailwind classes
+
+### Authentication Security
+- JWT-based authentication using Supabase
+- Custom claims for user identification
+- Protected routes via React Router
+- Admin-specific permissions
+
+### Responsive Design
+- Mobile-first approach with Tailwind CSS
+- Bottom navigation for mobile
+- Adaptive layouts for different screen sizes
+
+## Development Guidelines
+
+1. Create small, focused components and files
+2. Use Tailwind for all styling
+3. Follow TypeScript type definitions strictly
+4. Keep components under 50 lines of code when possible
+5. Use shadcn/ui components for consistent UI
+6. Create new files for new components rather than extending existing ones
+7. Follow the established folder structure
+8. Use Toast notifications for important events
+9. Implement responsive designs by default

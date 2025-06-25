@@ -1,0 +1,8 @@
+
+project_id = "tzihqfnkuyfgsjpetfzs"
+
+[functions.set_claim]
+verify_jwt = false
+
+[functions.update_register_user]
+verify_jwt = false
