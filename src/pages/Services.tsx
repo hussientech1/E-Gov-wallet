@@ -121,11 +121,11 @@ const Services: React.FC = () => {
   if (userVerified === false && !verifying) {
     return (
       <AppLayout>
-        <PageHeader title={t('services')} showBack />
+        <PageHeader title={t('Services')} showBack />
         <div className="p-4">
           <Card className="border-border/50 shadow-sm">
             <CardHeader>
-              <CardTitle className="text-destructive">{t('accountError')}</CardTitle>
+              <CardTitle className="text-destructive">{t('Account Error')}</CardTitle>
               <CardDescription>
                 Your account information is not properly set up in our system. 
                 Please contact support to resolve this issue before applying for services.
@@ -142,8 +142,8 @@ const Services: React.FC = () => {
       <PageHeader title={t('services')} showBack />
 
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4">{t('availableServices')}</h2>
-        
+        <h2 className="text-2xl font-bold mb-4">{t('Available eServices')}</h2>
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {isLoading ? (
             // Loading skeletons
@@ -166,7 +166,7 @@ const Services: React.FC = () => {
           ) : services.length === 0 ? (
             <Card className="border-border/50 shadow-sm col-span-full">
               <CardHeader>
-                <CardTitle>{t('noServices')}</CardTitle>
+                <CardTitle>{t('No Services')}</CardTitle>
                 <CardDescription>
                   There are currently no services available. Please check back later.
                 </CardDescription>

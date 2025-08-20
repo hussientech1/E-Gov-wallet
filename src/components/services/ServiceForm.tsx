@@ -9,8 +9,11 @@ import { ExecutionTypeToggle } from './ExecutionTypeToggle';
 import { OfficeSelect } from './OfficeSelect';
 import { EmergencySection } from './EmergencySection';
 import { UserConfirmation } from './UserConfirmation';
+import { ReplacementReasonSection } from './ReplacementReasonSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { ReplacementReasonType } from '@/types/documentValidation';
+import { getDocumentTypeName } from '@/services/documentValidation';
 
 interface ServiceFormData {
   serviceType: string;
@@ -19,6 +22,9 @@ interface ServiceFormData {
   invoiceNumber: string;
   isEmergency: boolean;
   emergencyReason: string;
+  isReplacement: boolean;
+  replacementType?: ReplacementReasonType;
+  replacementDetails: string;
 }
 
 interface ServiceFormProps {
@@ -27,29 +33,43 @@ interface ServiceFormProps {
   formData: ServiceFormData;
   onChange: (data: Partial<ServiceFormData>) => void;
   hideServiceSelect?: boolean;
+  isDocumentValidationComplete?: boolean;
 }
 
-export const ServiceForm: React.FC<ServiceFormProps> = ({ 
-  onSubmit, 
-  isLoading, 
+export const ServiceForm: React.FC<ServiceFormProps> = ({
+  onSubmit,
+  isLoading,
   formData,
   onChange,
-  hideServiceSelect = false
+  hideServiceSelect = false,
+  isDocumentValidationComplete = true
 }) => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { 
+  const {
     serviceType,
     isNewExecution,
     office,
     invoiceNumber,
     isEmergency,
-    emergencyReason 
+    emergencyReason,
+    isReplacement,
+    replacementType,
+    replacementDetails
   } = formData;
 
-  const isFormValid = serviceType && office && invoiceNumber.length >= 6 && (!isEmergency || emergencyReason);
+  // Enhanced form validation including replacement requirements and document validation
+  const isFormValid = serviceType &&
+    office &&
+    invoiceNumber.length >= 6 &&
+    (!isEmergency || emergencyReason) &&
+    (!isReplacement || replacementType) &&
+    isDocumentValidationComplete;
+
+  // Get document type name for replacement section
+  const documentTypeName = serviceType ? getDocumentTypeName(parseInt(serviceType)) : 'document';
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -73,7 +93,7 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
       />
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">{t('invoiceNumber')}</label>
+        <label className="text-sm font-medium">{t('Invoice Number')}</label>
         <Input
           value={invoiceNumber}
           onChange={e => onChange({ invoiceNumber: e.target.value })}
@@ -84,7 +104,17 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
         </p>
       </div>
 
-      <EmergencySection 
+      <ReplacementReasonSection
+        isReplacement={isReplacement}
+        onReplacementChange={(value) => onChange({ isReplacement: value })}
+        replacementType={replacementType}
+        onReplacementTypeChange={(type) => onChange({ replacementType: type })}
+        replacementDetails={replacementDetails}
+        onReplacementDetailsChange={(details) => onChange({ replacementDetails: details })}
+        documentTypeName={documentTypeName}
+      />
+
+      <EmergencySection
         isEmergency={isEmergency}
         setIsEmergency={(value) => onChange({ isEmergency: value })}
         emergencyReason={emergencyReason}
@@ -121,10 +151,10 @@ export const ServiceForm: React.FC<ServiceFormProps> = ({
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t('processing')}...
+              {t('Processing')}...
             </>
           ) : (
-            t('confirm')
+            t('Confirm')
           )}
         </Button>
       </div>

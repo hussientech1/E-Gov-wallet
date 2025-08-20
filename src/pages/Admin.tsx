@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminApplications from '@/components/admin/AdminApplications';
+import AdminPrintQueueFixed from '@/components/admin/AdminPrintQueueFixed';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminDocuments from '@/components/admin/AdminDocuments';
 import AdminNotifications from '@/components/admin/AdminNotifications';
@@ -81,6 +82,7 @@ const Admin: React.FC = () => {
         <TabsList className="mb-4 flex flex-wrap gap-2">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="applications">Applications</TabsTrigger>
+          <TabsTrigger value="print-queue">Print Queue</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -94,6 +96,10 @@ const Admin: React.FC = () => {
         
         <TabsContent value="applications">
           <AdminApplications />
+        </TabsContent>
+        
+        <TabsContent value="print-queue">
+          <AdminPrintQueueFixed />
         </TabsContent>
         
         <TabsContent value="users">

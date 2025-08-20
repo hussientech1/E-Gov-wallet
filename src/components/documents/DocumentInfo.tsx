@@ -24,22 +24,22 @@ export const DocumentInfo: React.FC<DocumentInfoProps> = ({
   
   return (
     <div>
-      <h3 className="font-semibold text-lg mb-3">{t('documentInformation')}</h3>
+      <h3 className="font-semibold text-lg mb-3">{t('Document Information')}</h3>
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="space-y-2">
           <div>
-            <p className="text-muted-foreground">{t('documentNumber')}</p>
+            <p className="text-muted-foreground">{t('Document Number')}</p>
             <p className="font-medium">{docNumber}</p>
           </div>
           
           <div>
-            <p className="text-muted-foreground">{t('issueDate')}</p>
+            <p className="text-muted-foreground">{t('Issue Date')}</p>
             <p className="font-medium">{formatDate(issueDate)}</p>
           </div>
           
           {docType === 'passport' && passportType && (
             <div>
-              <p className="text-muted-foreground">{t('passportType')}</p>
+              <p className="text-muted-foreground">{t('Passport Type')}</p>
               <p className="font-medium">{passportType}</p>
             </div>
           )}
@@ -47,12 +47,12 @@ export const DocumentInfo: React.FC<DocumentInfoProps> = ({
         
         <div className="space-y-2">
           <div>
-            <p className="text-muted-foreground">{t('expiryDate')}</p>
+            <p className="text-muted-foreground">{t('Expiry Date')}</p>
             <p className="font-medium">{formatDate(expiryDate)}</p>
           </div>
           
           <div>
-            <p className="text-muted-foreground">{t('issueAuthority')}</p>
+            <p className="text-muted-foreground">{t('Issue Authority')}</p>
             <p className="font-medium">{issueAuthority}</p>
           </div>
         </div>

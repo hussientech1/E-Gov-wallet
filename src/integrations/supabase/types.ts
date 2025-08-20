@@ -357,6 +357,153 @@ export type Database = {
         }
         Relationships: []
       }
+      uploaded_documents: {
+        Row: {
+          upload_id: number
+          application_id: number
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          mime_type: string
+          upload_status: string
+          rejection_reason: string | null
+          uploaded_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          upload_id?: number
+          application_id: number
+          document_type: string
+          file_name: string
+          file_path: string
+          file_size: number
+          mime_type: string
+          upload_status?: string
+          rejection_reason?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          upload_id?: number
+          application_id?: number
+          document_type?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          mime_type?: string
+          upload_status?: string
+          rejection_reason?: string | null
+          uploaded_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uploaded_documents_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "service_applications"
+            referencedColumns: ["application_id"]
+          },
+          {
+            foreignKeyName: "uploaded_documents_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["username"]
+          }
+        ]
+      }
+      print_queue: {
+        Row: {
+          queue_id: number
+          application_id: number
+          national_number: string
+          user_full_name: string
+          service_type: string
+          service_id: number
+          approval_date: string | null
+          print_status: string | null
+          printed_at: string | null
+          printed_by: string | null
+          office_location: string
+          document_id: number | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          queue_id?: number
+          application_id: number
+          national_number: string
+          user_full_name: string
+          service_type: string
+          service_id: number
+          approval_date?: string | null
+          print_status?: string | null
+          printed_at?: string | null
+          printed_by?: string | null
+          office_location: string
+          document_id?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          queue_id?: number
+          application_id?: number
+          national_number?: string
+          user_full_name?: string
+          service_type?: string
+          service_id?: number
+          approval_date?: string | null
+          print_status?: string | null
+          printed_at?: string | null
+          printed_by?: string | null
+          office_location?: string
+          document_id?: number | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "print_queue_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "service_applications"
+            referencedColumns: ["application_id"]
+          },
+          {
+            foreignKeyName: "print_queue_national_number_fkey"
+            columns: ["national_number"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["national_number"]
+          },
+          {
+            foreignKeyName: "print_queue_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["service_id"]
+          },
+          {
+            foreignKeyName: "print_queue_printed_by_fkey"
+            columns: ["printed_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["username"]
+          },
+          {
+            foreignKeyName: "print_queue_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "user_documents"
+            referencedColumns: ["doc_id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

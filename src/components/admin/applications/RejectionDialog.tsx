@@ -13,13 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from 'lucide-react';
-import { ServiceApplication } from '@/types/application';
+import { EnhancedServiceApplication } from '@/types/application';
 
 interface RejectionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onReject: () => void;
-  selectedApplication: ServiceApplication | null;
+  selectedApplication: EnhancedServiceApplication | null;
   rejectionReason: string;
   setRejectionReason: (reason: string) => void;
   processing: boolean;
@@ -29,6 +29,7 @@ export const RejectionDialog: React.FC<RejectionDialogProps> = ({
   open,
   onOpenChange,
   onReject,
+  selectedApplication,
   rejectionReason,
   setRejectionReason,
   processing
@@ -39,31 +40,53 @@ export const RejectionDialog: React.FC<RejectionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Reject Application</DialogTitle>
           <DialogDescription>
-            Enter the reason for rejecting the application.
+            {selectedApplication && (
+              <>
+                Rejecting application #{selectedApplication.application_id} for {selectedApplication.user_full_name} ({selectedApplication.service_name}).
+                <br />
+                Please provide a detailed reason for rejection.
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="rejectionReason" className="text-right">
-              Reason
+          <div className="space-y-2">
+            <Label htmlFor="rejectionReason">
+              Rejection Reason *
             </Label>
-            <Input 
-              id="rejectionReason" 
-              className="col-span-3" 
-              onChange={(e) => setRejectionReason(e.target.value)} 
+            <textarea
+              id="rejectionReason"
+              className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md resize-none"
+              placeholder="Please provide a detailed reason for rejecting this application..."
+              onChange={(e) => setRejectionReason(e.target.value)}
               value={rejectionReason}
+              disabled={processing}
             />
+            <p className="text-xs text-muted-foreground">
+              This reason will be visible to the applicant and stored in the system.
+            </p>
           </div>
         </div>
-        <DialogFooter>
-          <Button type="submit" onClick={onReject} disabled={processing}>
+        <DialogFooter className="gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={processing}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onReject}
+            disabled={processing || !rejectionReason.trim()}
+          >
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Rejecting...
               </>
             ) : (
-              "Reject"
+              "Reject Application"
             )}
           </Button>
         </DialogFooter>

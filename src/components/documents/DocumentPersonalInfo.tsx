@@ -62,8 +62,8 @@ export const DocumentPersonalInfo: React.FC<DocumentPersonalInfoProps> = ({ pers
   
   return (
     <div>
-      <h3 className="font-semibold text-lg mb-3">{t('personalInformation')}</h3>
-      
+      <h3 className="font-semibold text-lg mb-3">{t('Personal Information')}</h3>
+
       <div className="flex items-center gap-4 mb-4">
         <Avatar className="h-20 w-20">
           {profilePicture ? (
@@ -82,24 +82,24 @@ export const DocumentPersonalInfo: React.FC<DocumentPersonalInfoProps> = ({ pers
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div className="space-y-2">
           <div>
-            <p className="text-muted-foreground">{t('dateOfBirth')}</p>
+            <p className="text-muted-foreground">{t('Date of Birth')}</p>
             <p className="font-medium">{formatDate(personalInfo.dateOfBirth || null)}</p>
           </div>
           
           <div>
-            <p className="text-muted-foreground">{t('placeOfBirth')}</p>
+            <p className="text-muted-foreground">{t('Place of Birth')}</p>
             <p className="font-medium">{personalInfo.placeOfBirth}</p>
           </div>
         </div>
         
         <div className="space-y-2">
           <div>
-            <p className="text-muted-foreground">{t('gender')}</p>
+            <p className="text-muted-foreground">{t('Gender')}</p>
             <p className="font-medium">{personalInfo.gender}</p>
           </div>
           
           <div>
-            <p className="text-muted-foreground">{t('address')}</p>
+            <p className="text-muted-foreground">{t('Address')}</p>
             <p className="font-medium">{personalInfo.address}</p>
           </div>
         </div>

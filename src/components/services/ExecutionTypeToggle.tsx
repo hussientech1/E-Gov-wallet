@@ -23,7 +23,7 @@ export const ExecutionTypeToggle: React.FC<ExecutionTypeToggleProps> = ({
           onCheckedChange={() => setIsNewExecution(true)}
         />
         <label htmlFor="new-execution" className="text-sm cursor-pointer">
-          {t('newExecution')}
+          {t('New Execution')}
         </label>
       </div>
 
@@ -34,7 +34,7 @@ export const ExecutionTypeToggle: React.FC<ExecutionTypeToggleProps> = ({
           onCheckedChange={() => setIsNewExecution(false)} 
         />
         <label htmlFor="renewal" className="text-sm cursor-pointer">
-          {t('renewal')}
+          {t('Renewal')}
         </label>
       </div>
     </div>

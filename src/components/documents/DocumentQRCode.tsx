@@ -19,8 +19,8 @@ export const DocumentQRCode: React.FC<DocumentQRCodeProps> = ({ qrCode }) => {
     navigator.clipboard.writeText(qrCode).then(() => {
       setCopied(true);
       toast({
-        title: t('success'),
-        description: t('linkCopied'),
+        title: t('Success'),
+        description: t('Link Copied'),
       });
       
       setTimeout(() => setCopied(false), 2000);
@@ -41,8 +41,8 @@ export const DocumentQRCode: React.FC<DocumentQRCodeProps> = ({ qrCode }) => {
             <QrCode className="h-full w-full p-8 text-gray-600" />
           )}
         </div>
-        <p className="text-sm text-muted-foreground mb-3">{t('scanToVerify')}</p>
-        
+        <p className="text-sm text-muted-foreground mb-3">{t('Scan to Verify')}</p>
+
         {qrCode && (
           <div className="flex justify-center">
             <Button 

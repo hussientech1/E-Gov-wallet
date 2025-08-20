@@ -38,16 +38,16 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document }) => {
         </div>
 
         <div className="text-sm grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
-          <span className="text-muted-foreground">{t('issueDate')}:</span>
+          <span className="text-muted-foreground">{t('Issue Date')}:</span>
           <span>{formatDate(document.issue_date)}</span>
           
-          <span className="text-muted-foreground">{t('expiryDate')}:</span>
+          <span className="text-muted-foreground">{t('Expiry Date')}:</span>
           <span>{formatDate(document.expiry_date)}</span>
         </div>
 
         <div className="flex items-center gap-2 mt-3 text-xs text-primary">
           <Scan size={14} />
-          <span>{t('scanQrToVerify')}</span>
+          <span>{t('Scan QR To Verify')}</span>
           <ExternalLink size={14} className="ml-auto" />
         </div>
       </CardContent>
@@ -58,7 +58,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document }) => {
 // Get document validity status
 export const getDocumentStatus = (doc: DocumentData) => {
   if (!doc.expiry_date) return 'valid'; // No expiry
-  
+
   const now = new Date();
   const expiry = new Date(doc.expiry_date);
   const sixMonths = 6 * 30 * 24 * 60 * 60 * 1000; // Approximate 6 months in ms
@@ -72,11 +72,11 @@ export const getDocumentStatus = (doc: DocumentData) => {
 export const renderStatusBadge = (status: string, t: (key: string) => string) => {
   switch (status) {
     case 'valid':
-      return <Badge className="bg-success">{t('valid')}</Badge>;
+      return <Badge className="bg-success">{t('Valid')}</Badge>;
     case 'expiring':
-      return <Badge className="bg-warning text-warning-foreground">{t('expiringSoon')}</Badge>;
+      return <Badge className="bg-warning text-warning-foreground">{t('Expiring Soon')}</Badge>;
     case 'expired':
-      return <Badge variant="destructive">{t('expired')}</Badge>;
+      return <Badge variant="destructive">{t('Expired')}</Badge>;
     default:
       return null;
   }
@@ -97,13 +97,13 @@ export const formatDate = (dateString: string | null) => {
 export const getDocumentTitle = (type: string, t: (key: string) => string) => {
   switch (type) {
     case 'national_id':
-      return t('nationalIdCard');
+      return t('National ID Card');
     case 'passport':
-      return t('passport');
+      return t('Passport');
     case 'birth_certificate':
-      return t('birthCertificate');
+      return t('Birth Certificate');
     case 'driver_license':
-      return t('driverLicense');
+      return t('Driver License');
     default:
       return type;
   }

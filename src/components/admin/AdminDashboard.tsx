@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { adminSupabase, AdminLog } from '@/integrations/supabase/admin-client';
-import { UserIcon, FileTextIcon, CheckCircleIcon, XCircleIcon, ActivityIcon } from 'lucide-react';
+import { UserIcon, FileTextIcon, CheckCircleIcon, XCircleIcon, ActivityIcon, PrinterIcon } from 'lucide-react';
 
 interface StatsData {
   userCount: number;
@@ -11,6 +11,7 @@ interface StatsData {
   approvedApplications: number;
   rejectedApplications: number;
   documentCount: number;
+  pendingPrintCount: number;
 }
 
 interface ActivityLog {
@@ -27,6 +28,7 @@ const AdminDashboard: React.FC = () => {
     approvedApplications: 0,
     rejectedApplications: 0,
     documentCount: 0,
+    pendingPrintCount: 0,
   });
   const [loading, setLoading] = useState(true);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
@@ -62,6 +64,12 @@ const AdminDashboard: React.FC = () => {
           .from('user_documents')
           .select('*', { count: 'exact', head: true });
           
+        // Fetch pending print queue count
+        const { count: pendingPrintCount, error: printError } = await adminSupabase
+          .from('print_queue')
+          .select('*', { count: 'exact', head: true })
+          .eq('print_status', 'pending_print');
+          
         // Fetch recent admin activity logs
         const { data: logData, error: logError } = await adminSupabase
           .from('admin_logs')
@@ -90,6 +98,7 @@ const AdminDashboard: React.FC = () => {
           approvedApplications: approvedCount || 0,
           rejectedApplications: rejectedCount || 0,
           documentCount: docCount || 0,
+          pendingPrintCount: pendingPrintCount || 0,
         });
 
         setLoading(false);
@@ -110,24 +119,30 @@ const AdminDashboard: React.FC = () => {
         <div className="text-center py-10">Loading dashboard data...</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard 
-              title="Registered Users" 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Registered Users"
               value={stats.userCount}
               icon={<UserIcon className="h-8 w-8 text-blue-500" />}
-              description="Total registered users" 
+              description="Total registered users"
             />
-            <StatCard 
-              title="Pending Requests" 
+            <StatCard
+              title="Pending Requests"
               value={stats.pendingRequests}
               icon={<FileTextIcon className="h-8 w-8 text-amber-500" />}
-              description="Service applications awaiting review" 
+              description="Service applications awaiting review"
             />
-            <StatCard 
-              title="Documents Issued" 
+            <StatCard
+              title="Documents Issued"
               value={stats.documentCount}
               icon={<FileTextIcon className="h-8 w-8 text-green-500" />}
-              description="Total documents in system" 
+              description="Total documents in system"
+            />
+            <StatCard
+              title="Pending Print"
+              value={stats.pendingPrintCount}
+              icon={<PrinterIcon className="h-8 w-8 text-blue-500" />}
+              description="Documents awaiting printing"
             />
           </div>
           

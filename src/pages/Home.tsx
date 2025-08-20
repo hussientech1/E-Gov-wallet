@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { DocumentData } from '@/types/document';
 import { getDocumentTitle } from '@/components/documents/DocumentCard';
+import { Description } from '@radix-ui/react-toast';
 
 const Home: React.FC = () => {
   const { user } = useAuth();
@@ -38,8 +39,8 @@ const Home: React.FC = () => {
         if (docsError) {
           console.error('Error fetching documents:', docsError);
           toast({
-            title: t('error'),
-            description: t('errorFetchingDocuments'),
+            title: t('Error'),
+            description: t('Error Fetching Documents'),
             variant: "destructive"
           });
         } else {
@@ -57,8 +58,8 @@ const Home: React.FC = () => {
         if (appsError) {
           console.error('Error fetching applications:', appsError);
           toast({
-            title: t('error'),
-            description: t('errorFetchingApplications'),
+            title: t('Error'),
+            description: t('Error Fetching Applications'),
             variant: "destructive"
           });
         } else {
@@ -67,8 +68,8 @@ const Home: React.FC = () => {
       } catch (error) {
         console.error('Error:', error);
         toast({
-          title: t('error'),
-          description: t('somethingWentWrong'),
+          title: t('Error'),
+          description: t('Something Went Wrong'),
           variant: "destructive"
         });
       } finally {
@@ -95,22 +96,23 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout>
-      <PageHeader title={`${t('welcome')}, ${user?.fullName || t('user')}`}>
-        {/* Add header actions if needed */}
+      <PageHeader title={`${t('Welcome to MOI Platform')}, ${user?.fullName || t('user')}`}>
+        {t('We Empower Citizens Through Technology')}
       </PageHeader>
+      <Description className="text-foreground text-sm">{t('You Can Access Your Documents and Applications Here')}</Description>
 
       <div className="p-4 space-y-6">
         {/* Quick Access Documents */}
         <section>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">{t('documents')}</h2>
+            <h2 className="text-lg font-medium">{t('Documents')}</h2>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/documents')}
               className="text-primary flex items-center gap-1"
             >
-              {t('viewAll')}
+              {t('View All')}
               <ExternalLink size={14} />
             </Button>
           </div>
@@ -138,14 +140,14 @@ const Home: React.FC = () => {
               ))
             ) : (
               <div className="col-span-2 text-center py-6">
-                <p className="text-muted-foreground">{t('noDocumentsFound')}</p>
+                <p className="text-muted-foreground">{t('No Documents Found')}</p>
                 <Button 
                   className="mt-2" 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/services')}
                 >
-                  {t('applyForDocument')}
+                  {t('Apply For Document')}
                 </Button>
               </div>
             )}
@@ -155,14 +157,14 @@ const Home: React.FC = () => {
         {/* Recent Applications */}
         <section>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">{t('recentApplications')}</h2>
+            <h2 className="text-lg font-medium">{t('Recent Applications')}</h2>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/notifications')}
               className="text-primary flex items-center gap-1"
             >
-              {t('viewAll')}
+              {t('View All')}
               <ExternalLink size={14} />
             </Button>
           </div>
@@ -184,11 +186,11 @@ const Home: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {t('applied')}: {new Date(app.submitted_at).toLocaleDateString()}
+                      {t('Applied')}: {new Date(app.submitted_at).toLocaleDateString()}
                     </p>
                     {app.application_status === 'Rejected' && app.rejection_reason && (
                       <p className="text-sm text-destructive mt-1">
-                        {t('reason')}: {app.rejection_reason}
+                        {t('Reason')}: {app.rejection_reason}
                       </p>
                     )}
                   </CardContent>
@@ -196,7 +198,7 @@ const Home: React.FC = () => {
               ))
             ) : (
               <div className="text-center py-6">
-                <p className="text-muted-foreground">{t('noApplicationsFound')}</p>
+                <p className="text-muted-foreground">{t('No Applications Found')}</p>
               </div>
             )}
           </div>
@@ -209,7 +211,7 @@ const Home: React.FC = () => {
             className="w-full"
             onClick={() => navigate('/services')}
           >
-            {t('applyForService')}
+            {t('Apply For Service')}
           </Button>
         </div>
       </div>

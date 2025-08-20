@@ -39,8 +39,8 @@ const DocumentDetail: React.FC = () => {
         
         if (isNaN(docId)) {
           toast({
-            title: t('error'),
-            description: t('invalidDocumentId'),
+            title: t('Error'),
+            description: t('Invalid Document ID'),
             variant: "destructive"
           });
           return;
@@ -79,8 +79,8 @@ const DocumentDetail: React.FC = () => {
           } else {
             setError("Failed to retrieve document information");
             toast({
-              title: t('error'),
-              description: t('errorFetchingDocument'),
+              title: t('Error'),
+              description: t('Error Fetching Document'),
               variant: "destructive"
             });
           }
@@ -119,10 +119,10 @@ const DocumentDetail: React.FC = () => {
           personal_info: {
             fullName: userData?.full_name || user.fullName,
             nationality: 'Sudanese',
-            dateOfBirth: userData?.birth_date || '1990-01-01',
+            dateOfBirth: userData?.birth_date || '2000-01-01',
             placeOfBirth: 'Khartoum',
             gender: userData?.gender || 'Male',
-            address: userData?.address || '123 Al Qasr Ave, Khartoum'
+            address: userData?.address || 'Sudan'
           },
           issueAuthority,
           passportType
@@ -133,8 +133,8 @@ const DocumentDetail: React.FC = () => {
         console.error('Error:', error);
         setError("An unexpected error occurred");
         toast({
-          title: t('error'),
-          description: t('somethingWentWrong'),
+          title: t('Error'),
+          description: t('Something Went Wrong'),
           variant: "destructive"
         });
       } finally {
@@ -160,8 +160,8 @@ const DocumentDetail: React.FC = () => {
   const handleDocumentUpdated = (updatedDocument: DocumentData) => {
     setDocument(updatedDocument);
     toast({
-      title: t('documentUpdated'),
-      description: t('documentUpdatedDescription')
+      title: t('Document Updated'),
+      description: t('Document updated successfully')
     });
   };
 
@@ -178,7 +178,7 @@ const DocumentDetail: React.FC = () => {
         <Card className="overflow-hidden">
           <div className="bg-primary p-6 text-white">
             <div className="text-center">
-              <h2 className="text-xl font-bold">{t('republicOfSudan')}</h2>
+              <h2 className="text-xl font-bold">{t('Republic of Sudan')}</h2>
               <p>{getDocumentTitle(document.doc_type, t)}</p>
             </div>
           </div>

@@ -40,8 +40,8 @@ export const DocumentActions: React.FC<DocumentActionsProps> = ({
   const handleCopyLink = (url: string) => {
     navigator.clipboard.writeText(url);
     toast({
-      title: t('linkCopied'),
-      description: t('linkCopiedDescription'),
+      title: t('Link Copied'),
+      description: t('Link Copied Description'),
     });
   };
 
@@ -50,13 +50,13 @@ export const DocumentActions: React.FC<DocumentActionsProps> = ({
     try {
       if (navigator.share) {
         await navigator.share({
-          title: t('shareDocument'),
-          text: t('checkOutThisDocument'),
+          title: t('Share Docuent'),
+          text: t('Check Out This Document'),
           url: shareUrl,
         });
         toast({
-          title: t('documentShared'),
-          description: t('documentSharedDescription'),
+          title: t('Document Shared'),
+          description: t('Document Shared Description'),
         });
       } else {
         handleCopyLink(shareUrl);
@@ -80,15 +80,15 @@ export const DocumentActions: React.FC<DocumentActionsProps> = ({
       }
 
       toast({
-        title: t('documentDeleted'),
-        description: t('documentDeletedDescription'),
+        title: t('Document Deleted'),
+        description: t('Document Deleted Description'),
       });
       onDocumentDeleted(document.doc_id);
     } catch (error) {
       console.error('Error deleting document:', error);
       toast({
-        title: t('error'),
-        description: t('errorDeletingDocument'),
+        title: t('Error'),
+        description: t('Error Deleting Document'),
         variant: 'destructive',
       });
     } finally {
@@ -108,38 +108,38 @@ export const DocumentActions: React.FC<DocumentActionsProps> = ({
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
             <Edit className="mr-2 h-4 w-4" /> 
-            {t('edit')}
+            {t('Edit')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleShare(document.doc_id)}>
             <Share2 className="mr-2 h-4 w-4" /> 
-            {t('share')}
+            {t('Share')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleCopyLink(`${window.location.origin}/documents/${document.doc_id}`)}>
             <Copy className="mr-2 h-4 w-4" /> 
-            {t('copyLink')}
+            {t('Copy Link')}
           </DropdownMenuItem>
           <DropdownMenuItem disabled>
             <RotateCcw className="mr-2 h-4 w-4" /> 
-            {t('renew')}
+            {t('Renew')}
           </DropdownMenuItem>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <DropdownMenuItem className="text-destructive">
                 <Trash className="mr-2 h-4 w-4" /> 
-                {t('delete')}
+                {t('Delete')}
               </DropdownMenuItem>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{t('deleteConfirmation')}</AlertDialogTitle>
+                <AlertDialogTitle>{t('Delete Confirmation')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {t('deleteConfirmationDescription')}
+                  {t('Delete Confirmation Description')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
                 <AlertDialogAction disabled={isDeleting} onClick={handleDelete}>
-                  {isDeleting ? t('deleting') + '...' : t('delete')}
+                  {isDeleting ? t('Deleting') + '...' : t('Delete')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

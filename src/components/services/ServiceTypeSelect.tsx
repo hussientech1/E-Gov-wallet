@@ -34,10 +34,10 @@ export const ServiceTypeSelect: React.FC<ServiceTypeSelectProps> = ({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">{t('selectService')}</label>
+      <label className="text-sm font-medium">{t('Select Service')}</label>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger>
-          <SelectValue placeholder={`${t('selectService')}...`} />
+          <SelectValue placeholder={`${t('Select Service')}...`} />
         </SelectTrigger>
         <SelectContent>
           {serviceTypes.map(service => (

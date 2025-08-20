@@ -65,9 +65,9 @@ const AdminLogin: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center mb-4">
-            <span className="text-3xl font-bold text-white">E-GOV</span>
+            <span className="text-3xl font-bold text-white">E-MoI</span>
           </div>
-          <h1 className="text-2xl font-bold text-center">Admin Portal</h1>
+          <h1 className="text-2xl font-bold text-center">Sudanese Ministry of Interior Digital Platform - Admin Portal</h1>
         </div>
         
         <Card className="border-border/50 shadow-lg">
@@ -124,14 +124,14 @@ const AdminLogin: React.FC = () => {
               </Button>
               
               <div className="text-sm text-center">
-                Not an admin?{' '}
-                <Button 
+                {' '}
+                 <Button 
                   variant="link" 
                   className="p-0 h-auto font-normal"
                   onClick={() => navigate('/login')}
                 >
-                  User Login
-                </Button>
+                  
+                </Button> 
               </div>
             </CardFooter>
           </form>

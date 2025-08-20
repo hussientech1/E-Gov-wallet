@@ -47,24 +47,24 @@ const CreateProfileForm: React.FC<CreateProfileFormProps> = ({ user, onProfileCr
       if (error) {
         console.error('Error creating profile:', error);
         toast({
-          title: t('error'),
-          description: t('errorCreatingProfile'),
+          title: t('Error'),
+          description: t('Error Creating Profile'),
           variant: "destructive"
         });
         return;
       }
       
       toast({
-        title: t('success'),
-        description: t('profileCreatedSuccess'),
+        title: t('Success'),
+        description: t('Profile Created Successfully'),
       });
       
       onProfileCreated();
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: t('error'),
-        description: t('somethingWentWrong'),
+        title: t('Error'),
+        description: t('Something Went Wrong'),
         variant: "destructive"
       });
     } finally {
@@ -75,9 +75,9 @@ const CreateProfileForm: React.FC<CreateProfileFormProps> = ({ user, onProfileCr
   return (
     <div className="text-center py-6">
       <AlertTriangle className="h-12 w-12 text-warning mx-auto mb-4" />
-      <p className="text-lg font-medium">{t('profileNotFound') || 'Profile Not Found'}</p>
+      <p className="text-lg font-medium">{t('Profile Not Found') || 'Profile Not Found'}</p>
       <p className="text-muted-foreground mt-1 mb-6">
-        {t('profileNotFoundDescription') || 'You need to create a profile to use the services'}
+        {t('Profile Not Found Description') || 'You need to create a profile to use the services'}
       </p>
       
       <div className="space-y-6 max-w-sm mx-auto">
@@ -88,11 +88,11 @@ const CreateProfileForm: React.FC<CreateProfileFormProps> = ({ user, onProfileCr
         />
         
         <div>
-          <Label htmlFor="newPhoneNumber">{t('phoneNumber') || 'Phone Number'}</Label>
+          <Label htmlFor="New Phone Number">{t('phoneNumber') || 'Phone Number'}</Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              id="newPhoneNumber"
+              id="New Phone Number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               className="pl-10"

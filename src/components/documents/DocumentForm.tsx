@@ -55,8 +55,8 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
       if (error) throw error;
 
       toast({
-        title: t('documentUpdated'),
-        description: t('documentUpdatedDescription'),
+        title: t('Document Updated'),
+        description: t('Document Updated Description'),
       });
 
       onDocumentUpdated({
@@ -67,8 +67,8 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
     } catch (error) {
       console.error('Error updating document:', error);
       toast({
-        title: t('error'),
-        description: t('errorUpdatingDocument'),
+        title: t('Error'),
+        description: t('Error Updating Document'),
         variant: 'destructive',
       });
     } finally {
@@ -80,13 +80,13 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('editDocument')}</DialogTitle>
+          <DialogTitle>{t('Edit Document')}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="doc_number">{t('documentNumber')}</Label>
+              <Label htmlFor="doc_number">{t('Document Number')}</Label>
               <Input
                 id="doc_number"
                 name="doc_number"
@@ -97,7 +97,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="issue_date">{t('issueDate')}</Label>
+              <Label htmlFor="issue_date">{t('Issue Date')}</Label>
               <Input
                 id="issue_date"
                 name="issue_date"
@@ -109,7 +109,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="expiry_date">{t('expiryDate')}</Label>
+              <Label htmlFor="expiry_date">{t('Expiry Date')}</Label>
               <Input
                 id="expiry_date"
                 name="expiry_date"

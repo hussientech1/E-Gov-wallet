@@ -18,7 +18,14 @@ interface UserProfile {
   birth_date: string | null;
   gender: string | null;
   address: string | null;
+  state: string | null;
   phone_number: string;
+  email: string | null;
+  occupation: string | null;
+  education_level: string | null;
+  marital_status: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
   profile_picture?: string | null;
 }
 
@@ -45,7 +52,22 @@ const Profile: React.FC = () => {
       }
 
       if (data) {
-        setUserProfile(data);
+        setUserProfile({
+          national_number: data.national_number,
+          full_name: data.full_name,
+          birth_date: data.birth_date ?? null,
+          gender: data.gender ?? null,
+          address: data.address ?? null,
+          state: data.state ?? null,
+          phone_number: data.phone_number,
+          email: data.email ?? null,
+          occupation: data.occupation ?? null,
+          education_level: data.education_level ?? null,
+          marital_status: data.marital_status ?? null,
+          emergency_contact_name: data.emergency_contact_name ?? null,
+          emergency_contact_phone: data.emergency_contact_phone ?? null,
+          profile_picture: data.profile_picture ?? null,
+        });
         setProfilePicture(data.profile_picture || null);
       }
     } catch (error) {

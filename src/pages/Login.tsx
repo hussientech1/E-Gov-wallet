@@ -71,9 +71,9 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center mb-4">
-            <span className="text-3xl font-bold text-white">E-GOV</span>
+            <span className="text-2xl font-bold text-white">E-MoI</span>
           </div>
-          <h1 className="text-2xl font-bold text-center">Sudan E-Gov Digital Wallet</h1>
+          <h1 className="text-3xl font-bold text-center">Sudanese Ministry of Interior Digital Platform</h1>
         </div>
         
         <Card className="border-border/50 shadow-lg">
@@ -112,7 +112,7 @@ const Login: React.FC = () => {
                     e.preventDefault();
                   }}
                 >
-                  {t('forgotPassword')}
+                  {t('Forgot Password')}
                 </Button>
               </div>
             </CardContent>
@@ -126,10 +126,10 @@ const Login: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('loading')}...
+                    {t('Loading')}...
                   </>
                 ) : (
-                  t('signIn')
+                  t('Sign In')
                 )}
               </Button>
               

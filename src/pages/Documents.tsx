@@ -69,8 +69,8 @@ const Documents: React.FC = () => {
           console.error('Error fetching documents:', error);
           setError('Failed to load documents');
           toast({
-            title: t('error'),
-            description: t('errorFetchingDocuments'),
+            title: t('Error'),
+            description: t('Error Fetching Documents'),
             variant: "destructive"
           });
           return;
@@ -82,8 +82,8 @@ const Documents: React.FC = () => {
         console.error('Error:', error);
         setError('An unexpected error occurred');
         toast({
-          title: t('error'),
-          description: t('somethingWentWrong'),
+          title: t('Error'),
+          description: t('Something Went Wrong'),
           variant: "destructive"
         });
       } finally {
@@ -157,7 +157,7 @@ const Documents: React.FC = () => {
   if (loading) {
     return (
       <AppLayout>
-        <PageHeader title={t('documents')} />
+        <PageHeader title={t('Documents')} />
         <DocumentSkeleton />
       </AppLayout>
     );
@@ -167,7 +167,7 @@ const Documents: React.FC = () => {
   if (error) {
     return (
       <AppLayout>
-        <PageHeader title={t('documents')} />
+        <PageHeader title={t('Documents')} />
         <div className="p-4">
           <DocumentError error={error} />
         </div>
@@ -177,7 +177,7 @@ const Documents: React.FC = () => {
 
   return (
     <AppLayout>
-      <PageHeader title={t('documents')} />
+      <PageHeader title={t('Documents')} />
 
       <div className="p-4 space-y-6">
         <div className="flex flex-col md:flex-row gap-3">
@@ -196,9 +196,9 @@ const Documents: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="issue_date">{t('issueDate')}</SelectItem>
-                  <SelectItem value="expiry_date">{t('expiryDate')}</SelectItem>
-                  <SelectItem value="doc_type">{t('documentType')}</SelectItem>
+                  <SelectItem value="issue_date">{t('Issue Date')}</SelectItem>
+                  <SelectItem value="expiry_date">{t('Expiry Date')}</SelectItem>
+                  <SelectItem value="doc_type">{t('Document Type')}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

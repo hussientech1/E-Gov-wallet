@@ -33,7 +33,7 @@ const NationalNumberInput: React.FC<NationalNumberInputProps> = ({
   return (
     <div className="space-y-2">
       <Label 
-        htmlFor="nationalNumber"
+        htmlFor="National Number"
         className={`transition-colors ${focused ? 'text-primary' : ''}`}
       >
         {t('nationalNumber')}

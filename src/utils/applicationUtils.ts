@@ -101,13 +101,48 @@ export const handleApplicationApproval = async (
 
         console.log('Document created successfully:', docData);
         
+        // Get user's full name for print queue
+        const { data: userData, error: userError } = await adminSupabase
+          .from('users')
+          .select('full_name')
+          .eq('national_number', application.national_number)
+          .single();
+
+        const userFullName = userData?.full_name || 'Unknown User';
+
+        // Add approved application to print queue
+        const { error: queueError } = await adminSupabase
+          .from('print_queue')
+          .insert({
+            application_id: application.application_id,
+            national_number: application.national_number,
+            user_full_name: userFullName,
+            service_type: getServiceName(application.service_id),
+            service_id: application.service_id,
+            office_location: application.office_location,
+            document_id: docData?.doc_id || null,
+            print_status: 'pending_print'
+          });
+
+        if (queueError) {
+          console.error('Error adding to print queue:', queueError);
+          // Don't fail the approval process if print queue insertion fails
+          toast({
+            title: "Warning",
+            description: "Application approved but failed to add to print queue. Please add manually.",
+            variant: "destructive",
+          });
+        } else {
+          console.log('Successfully added to print queue');
+        }
+        
         // Create notification with more detailed information
         const { error: notifError } = await adminSupabase
           .from('notifications')
           .insert({
             national_number: application.national_number,
             title: 'Application Approved',
-            message: `Your application for ${getServiceName(application.service_id)} has been approved. Your document is now available in your Documents section.`,
+            message: `Your application for ${getServiceName(application.service_id)} has been approved. Your document has been queued for printing and will be ready for collection at ${application.office_location}.`,
             status_type: 'success'
           });
 

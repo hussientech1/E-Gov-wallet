@@ -69,7 +69,7 @@ const Settings: React.FC = () => {
 
   return (
     <AppLayout>
-      <PageHeader title={t('settings')} />
+      <PageHeader title={t('Settings')} />
 
       <div className="p-4 space-y-6">
         {/* Profile Section */}
@@ -85,9 +85,9 @@ const Settings: React.FC = () => {
                   <User className="h-5 w-5 text-primary" />
                 </div>
                 <div className="text-left">
-                  <p className="font-medium">{t('editProfile')}</p>
+                  <p className="font-medium">{t('Edit Profile')}</p>
                   <p className="text-sm text-muted-foreground">
-                    {t('updateYourInformation')}
+                    {t('Update Your Information')}
                   </p>
                 </div>
               </div>
@@ -98,16 +98,16 @@ const Settings: React.FC = () => {
 
         {/* Preferences Section */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium px-1">{t('preferences')}</h2>
-          
+          <h2 className="text-lg font-medium px-1">{t('Preferences')}</h2>
+
           <Card>
             <CardContent className="p-4 space-y-6">
               {/* Language Selection */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{t('language')}</p>
+                  <p className="font-medium">{t('Language')}</p>
                   <p className="text-sm text-muted-foreground">
-                    {t('selectYourLanguage')}
+                    {t('Select Your Language')}
                   </p>
                 </div>
                 <Select value={language} onValueChange={(value) => setLanguage(value as 'en' | 'ar')}>
@@ -124,9 +124,9 @@ const Settings: React.FC = () => {
               {/* Theme Toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{t('theme')}</p>
+                  <p className="font-medium">{t('Theme')}</p>
                   <p className="text-sm text-muted-foreground">
-                    {theme === 'dark' ? t('dark') : t('light')} {t('mode')}
+                    {theme === 'dark' ? t('Dark') : t('Light')} {t('Mode')}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ const Settings: React.FC = () => {
 
         {/* Support Section */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium px-1">{t('support')}</h2>
+          <h2 className="text-lg font-medium px-1">{t('Support')}</h2>
           
           <Card>
             <CardContent className="p-4 space-y-4">
@@ -176,16 +176,16 @@ const Settings: React.FC = () => {
                 onClick={() => window.location.href = 'tel:+123456789'}
               >
                 <Phone className="h-4 w-4" />
-                {t('contactSupport')}
+                {t('Contact Support')}
               </Button>
               
               <Button 
                 variant="outline" 
                 className="w-full justify-start gap-3"
-                onClick={() => window.location.href = 'mailto:support@egov-sudan.com'}
+                onClick={() => window.location.href = 'Mail to: support@egov-sudan.com'}
               >
                 <Mail className="h-4 w-4" />
-                {t('emailSupport')}
+                {t('Email Support')}
               </Button>
               
               <Button 
@@ -194,7 +194,7 @@ const Settings: React.FC = () => {
                 onClick={() => navigate('/help')}
               >
                 <HelpCircle className="h-4 w-4" />
-                {t('helpCenter')}
+                {t('Help Center')}
               </Button>
             </CardContent>
           </Card>
@@ -207,7 +207,7 @@ const Settings: React.FC = () => {
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
-          {t('logout')}
+          {t('Logout')}
         </Button>
       </div>
     </AppLayout>

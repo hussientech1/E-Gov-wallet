@@ -11,7 +11,7 @@ export const DocumentDetailSkeleton: React.FC = () => {
   
   return (
     <AppLayout>
-      <PageHeader title={t('loading')} showBack />
+      <PageHeader title={t('Loading')} showBack />
       <div className="p-4 space-y-6">
         <Card>
           <div className="bg-primary p-6">

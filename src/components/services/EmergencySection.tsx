@@ -24,14 +24,14 @@ export const EmergencySection: React.FC<EmergencySectionProps> = ({
     <>
       <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/30 rounded-md">
         <Checkbox 
-          id="emergency" 
+          id="Emergency" 
           checked={isEmergency}
           onCheckedChange={checked => setIsEmergency(!!checked)}
         />
         <div className="grid gap-1">
-          <label htmlFor="emergency" className="text-sm font-medium cursor-pointer flex items-center gap-1">
+          <label htmlFor="Emergency" className="text-sm font-medium cursor-pointer flex items-center gap-1">
             <AlertTriangle size={14} className="text-warning" />
-            {t('emergencyRequest')}
+            {t('Emergency Request')}
           </label>
           <p className="text-xs text-muted-foreground">
             Select for urgent processing (additional fees may apply)

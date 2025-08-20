@@ -18,7 +18,7 @@ export const DocumentDetailError: React.FC<DocumentDetailErrorProps> = ({ error 
   
   return (
     <AppLayout>
-      <PageHeader title={t('error')} showBack />
+      <PageHeader title={t('Error')} showBack />
       <div className="p-4">
         <Card>
           <CardContent className="p-6">
@@ -28,11 +28,11 @@ export const DocumentDetailError: React.FC<DocumentDetailErrorProps> = ({ error 
               <p className="text-muted-foreground mb-6">{error}</p>
               {error.includes('profile') ? (
                 <Button onClick={() => navigate('/profile')} className="w-full max-w-xs">
-                  {t('goToProfile')}
+                  {t('Go To Profile')}
                 </Button>
               ) : (
                 <Button onClick={() => navigate('/documents')} className="w-full max-w-xs">
-                  {t('backToDocuments')}
+                  {t('Back To Documents')}
                 </Button>
               )}
             </div>

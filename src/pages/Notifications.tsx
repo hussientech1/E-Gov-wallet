@@ -67,11 +67,11 @@ const Notifications: React.FC = () => {
   // Status icon mapping
   const getStatusIcon = (status: string | null) => {
     switch (status) {
-      case 'warning':
+      case 'Warning':
         return <Clock className="h-5 w-5 text-warning" />;
-      case 'success':
+      case 'Success':
         return <Check className="h-5 w-5 text-success" />;
-      case 'error':
+      case 'Error':
         return <X className="h-5 w-5 text-destructive" />;
       default:
         return <BellRing className="h-5 w-5 text-primary" />;
@@ -92,7 +92,7 @@ const Notifications: React.FC = () => {
 
   return (
     <AppLayout>
-      <PageHeader title={t('notifications')} />
+      <PageHeader title={t('Notifications')} />
 
       <div className="p-4 space-y-6">
         {/* Success message for new application */}
@@ -150,9 +150,9 @@ const Notifications: React.FC = () => {
           ) : (
             <div className="text-center py-10">
               <BellRing className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <h3 className="font-medium">{t('noNotifications')}</h3>
+              <h3 className="font-medium">{t('No Notifications')}</h3>
               <p className="text-sm text-muted-foreground">
-                {t('noNotificationsDescription')}
+                {t('No Notifications Description')}
               </p>
             </div>
           )}

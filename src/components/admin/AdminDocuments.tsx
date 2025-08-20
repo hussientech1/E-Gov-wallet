@@ -86,7 +86,7 @@ const AdminDocuments: React.FC = () => {
       console.error('Error:', error);
       toast({
         title: t('error'),
-        description: t('somethingWentWrong'),
+        description: t('Something Went Wrong'),
         variant: "destructive"
       });
     } finally {
@@ -173,14 +173,14 @@ const AdminDocuments: React.FC = () => {
       // Update local state
       setDocuments(documents.filter(doc => doc.doc_id !== documentId));
       toast({
-        title: t('success'),
-        description: t('documentDeleted'),
+        title: t('Success'),
+        description: t('Document Deleted'),
       });
     } catch (error) {
       console.error('Error deleting document:', error);
       toast({
-        title: t('error'),
-        description: t('errorDeletingDocument'),
+        title: t('Error'),
+        description: t('Error Deleting Document'),
         variant: "destructive"
       });
     }
@@ -229,35 +229,34 @@ const AdminDocuments: React.FC = () => {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold">Document Management</h2>
       
-      <Tabs defaultValue="all" className="w-full">
+      <Tabs defaultValue="All" className="w-full">
         <TabsList>
-          <TabsTrigger value="all">{t('allDocuments')}</TabsTrigger>
-          <TabsTrigger value="pending">{t('pendingReview')}</TabsTrigger>
-          <TabsTrigger value="templates">{t('documentTemplates')}</TabsTrigger>
+          <TabsTrigger value="All">{t('All Documents')}</TabsTrigger>
+          <TabsTrigger value="Pending">{t('Pending Review')}</TabsTrigger>
+          <TabsTrigger value="Templates">{t('Document Templates')}</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="all" className="space-y-4 pt-4">
+        <TabsContent value="All" className="space-y-4 pt-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>{t('allDocuments')}</span>
+                <span>{t('All Documents')}</span>
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline" className="flex gap-1 items-center">
                     <Smartphone size={14} /> {isMobile ? 'Mobile' : 'Desktop'}
                   </Badge>
                   <Badge variant="outline" className="flex gap-1 items-center">
-                    <Languages size={14} /> {t('multiLanguageSupport')}
+                    <Languages size={14} /> {t('Multi Language Support')}
                   </Badge>
                 </div>
               </CardTitle>
-              <CardDescription>{t('manageAllDocumentsInTheSystem')}</CardDescription>
+              <CardDescription>{t('Manage all documents in the system')}</CardDescription>
             </CardHeader>
             <CardContent>
               {/* Filtering and sorting controls */}
               <div className="flex flex-col md:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
                   <Input
-                    placeholder={t('searchDocuments')}
+                    placeholder={t('Search Documents')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -268,15 +267,15 @@ const AdminDocuments: React.FC = () => {
                 <div className="flex gap-2">
                   <Select value={documentType} onValueChange={setDocumentType}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder={t('documentType')} />
+                      <SelectValue placeholder={t('Document Type')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="all">{t('all')}</SelectItem>
-                        <SelectItem value="passport">{t('passport')}</SelectItem>
-                        <SelectItem value="national_id">{t('nationalIdCard')}</SelectItem>
-                        <SelectItem value="birth_certificate">{t('birthCertificate')}</SelectItem>
-                        <SelectItem value="driver_license">{t('driverLicense')}</SelectItem>
+                        <SelectItem value="all">{t('All')}</SelectItem>
+                        <SelectItem value="passport">{t('Passport')}</SelectItem>
+                        <SelectItem value="national_id">{t('National ID Card')}</SelectItem>
+                        <SelectItem value="birth_certificate">{t('Birth Certificate')}</SelectItem>
+                        <SelectItem value="driver_license">{t('Driver License')}</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -287,10 +286,10 @@ const AdminDocuments: React.FC = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="all">{t('all')}</SelectItem>
-                        <SelectItem value="valid">{t('valid')}</SelectItem>
-                        <SelectItem value="expiring">{t('expiringSoon')}</SelectItem>
-                        <SelectItem value="expired">{t('expired')}</SelectItem>
+                        <SelectItem value="all">{t('All')}</SelectItem>
+                        <SelectItem value="valid">{t('Valid')}</SelectItem>
+                        <SelectItem value="expiring">{t('Expiring Soon')}</SelectItem>
+                        <SelectItem value="expired">{t('Expired')}</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -301,10 +300,10 @@ const AdminDocuments: React.FC = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="issue_date">{t('issueDate')}</SelectItem>
-                        <SelectItem value="expiry_date">{t('expiryDate')}</SelectItem>
-                        <SelectItem value="name">{t('name')}</SelectItem>
-                        <SelectItem value="doc_number">{t('documentNumber')}</SelectItem>
+                        <SelectItem value="issue_date">{t('Issue Date')}</SelectItem>
+                        <SelectItem value="expiry_date">{t('Expiry Date')}</SelectItem>
+                        <SelectItem value="name">{t('Name')}</SelectItem>
+                        <SelectItem value="doc_number">{t('Document Number')}</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -324,12 +323,12 @@ const AdminDocuments: React.FC = () => {
         <TabsContent value="pending" className="space-y-4 pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('pendingDocuments')}</CardTitle>
-              <CardDescription>{t('reviewDocumentsPendingApproval')}</CardDescription>
+              <CardTitle>{t('Pending Documents')}</CardTitle>
+              <CardDescription>{t('Review Documents Pending Approval')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="py-8 text-center text-muted-foreground">
-                {t('pendingDocumentApprovalFunctionality')}
+                {t('Pending Document Approval Functionality')}
               </div>
             </CardContent>
           </Card>
@@ -338,12 +337,12 @@ const AdminDocuments: React.FC = () => {
         <TabsContent value="templates" className="space-y-4 pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('documentTemplates')}</CardTitle>
-              <CardDescription>{t('manageDocumentTemplatesUsedForDocumentGeneration')}</CardDescription>
+              <CardTitle>{t('Document Templates')}</CardTitle>
+              <CardDescription>{t('Manage Document Templates Used for Document Generation')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="py-8 text-center text-muted-foreground">
-                {t('templateManagementFunctionality')}
+                {t('Template Management Functionality')}
               </div>
             </CardContent>
           </Card>

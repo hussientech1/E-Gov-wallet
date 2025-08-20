@@ -29,8 +29,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: t('error'),
-        description: t('imageTooLarge') || 'Image too large. Maximum size is 5MB.',
+        title: t('Error'),
+        description: t('Image Too Large') || 'Image too large. Maximum size is 5MB.',
         variant: "destructive"
       });
       return;
@@ -47,8 +47,8 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     };
     reader.onerror = () => {
       toast({
-        title: t('error'),
-        description: t('errorReadingImage') || 'Error reading image.',
+        title: t('Error'),
+        description: t('Error Reading Image') || 'Error reading image.',
         variant: "destructive"
       });
       setIsUploading(false);

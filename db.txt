@@ -1,0 +1,108 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.admin_logs (
+  log_id integer NOT NULL DEFAULT nextval('admin_logs_log_id_seq'::regclass),
+  admin_username character varying NOT NULL,
+  action text NOT NULL,
+  ip_address character varying NOT NULL,
+  created_at timestamp without time zone DEFAULT now(),
+  CONSTRAINT admin_logs_pkey PRIMARY KEY (log_id)
+);
+CREATE TABLE public.admin_users (
+  admin_id integer NOT NULL DEFAULT nextval('admin_users_admin_id_seq'::regclass),
+  username character varying NOT NULL,
+  password character varying NOT NULL,
+  full_name character varying NOT NULL,
+  is_active boolean DEFAULT true,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT admin_users_pkey PRIMARY KEY (admin_id)
+);
+CREATE TABLE public.notifications (
+  notification_id integer NOT NULL DEFAULT nextval('notifications_notification_id_seq'::regclass),
+  national_number character varying,
+  title character varying NOT NULL,
+  message text NOT NULL,
+  status_type character varying,
+  is_read boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT notifications_pkey PRIMARY KEY (notification_id),
+  CONSTRAINT notifications_national_number_fkey FOREIGN KEY (national_number) REFERENCES public.users(national_number)
+);
+CREATE TABLE public.password_reset_tokens (
+  token_id integer NOT NULL DEFAULT nextval('password_reset_tokens_token_id_seq'::regclass),
+  national_number character varying,
+  token character varying NOT NULL,
+  expires_at timestamp without time zone NOT NULL,
+  used boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT password_reset_tokens_pkey PRIMARY KEY (token_id),
+  CONSTRAINT password_reset_tokens_national_number_fkey FOREIGN KEY (national_number) REFERENCES public.users(national_number)
+);
+CREATE TABLE public.service_applications (
+  application_id integer NOT NULL DEFAULT nextval('service_applications_application_id_seq'::regclass),
+  national_number character varying,
+  service_id integer,
+  submitted_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at timestamp without time zone,
+  reviewed_by character varying,
+  application_status character varying DEFAULT 'Pending'::character varying,
+  payment_status character varying DEFAULT 'Unpaid'::character varying,
+  invoice_number character varying NOT NULL,
+  office_location character varying NOT NULL,
+  emergency_reason text,
+  rejection_reason text,
+  CONSTRAINT service_applications_pkey PRIMARY KEY (application_id),
+  CONSTRAINT service_applications_national_number_fkey FOREIGN KEY (national_number) REFERENCES public.users(national_number),
+  CONSTRAINT service_applications_service_id_fkey FOREIGN KEY (service_id) REFERENCES public.services(service_id)
+);
+CREATE TABLE public.services (
+  service_id integer NOT NULL DEFAULT nextval('services_service_id_seq'::regclass),
+  service_name character varying NOT NULL,
+  description text,
+  fee numeric,
+  required_documents ARRAY,
+  processing_time character varying,
+  is_active boolean DEFAULT true,
+  CONSTRAINT services_pkey PRIMARY KEY (service_id)
+);
+CREATE TABLE public.support_requests (
+  request_id integer NOT NULL DEFAULT nextval('support_requests_request_id_seq'::regclass),
+  national_number character varying,
+  subject character varying,
+  message text,
+  status character varying DEFAULT 'Open'::character varying,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT support_requests_pkey PRIMARY KEY (request_id),
+  CONSTRAINT support_requests_national_number_fkey FOREIGN KEY (national_number) REFERENCES public.users(national_number)
+);
+CREATE TABLE public.user_documents (
+  doc_id integer NOT NULL DEFAULT nextval('user_documents_doc_id_seq'::regclass),
+  national_number character varying,
+  doc_type USER-DEFINED NOT NULL,
+  doc_number character varying NOT NULL,
+  issue_date date NOT NULL,
+  expiry_date date,
+  document_status USER-DEFINED DEFAULT 'active'::document_status,
+  qr_code text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT user_documents_pkey PRIMARY KEY (doc_id),
+  CONSTRAINT user_documents_national_number_fkey FOREIGN KEY (national_number) REFERENCES public.users(national_number)
+);
+CREATE TABLE public.users (
+  national_number character varying NOT NULL,
+  full_name character varying NOT NULL,
+  password_hash text NOT NULL,
+  phone_number character varying NOT NULL,
+  email character varying,
+  gender character varying,
+  address text,
+  state character varying,
+  birth_date date,
+  profile_completed boolean DEFAULT false,
+  dark_mode_enabled boolean DEFAULT false,
+  language_preference character varying DEFAULT 'en'::character varying,
+  profile_picture text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT users_pkey PRIMARY KEY (national_number)
+);

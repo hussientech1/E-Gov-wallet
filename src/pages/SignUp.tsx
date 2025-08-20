@@ -52,10 +52,36 @@ const stateOptions = [
   'Northern'
 ];
 
+const maritalStatusOptions = [
+  'Single',
+  'Married',
+  'Divorced',
+  'Widowed'
+];
+
+const educationLevelOptions = [
+  'No formal education',
+  'Primary education',
+  'Secondary education',
+  'University/College',
+  'Postgraduate',
+  'Technical/Vocational'
+];
+
+const occupationOptions = [
+  'Student',
+  'Government Employee',
+  'Private Sector',
+  'Self-employed',
+  'Unemployed',
+  'Retired',
+  'Other'
+];
+
 const SignUp = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
@@ -65,14 +91,25 @@ const SignUp = () => {
       .regex(/^[A-Za-z]{2}[0-9]{10}$/, 'Must be 2 letters followed by 10 numbers'),
     password: z.string()
       .min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string()
+      .min(6, 'Password confirmation is required'),
     fullName: z.string()
       .min(2, 'Full name is required'),
     phoneNumber: z.string()
       .regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
-    gender: z.string().optional(),
-    state: z.string().optional(),
-    address: z.string().optional(),
-    email: z.string().email('Invalid email').optional().or(z.literal(''))
+    gender: z.string().min(1, 'Gender is required'),
+    state: z.string().min(1, 'State is required'),
+    address: z.string().min(5, 'Address is required'),
+    email: z.string().email('Invalid email').optional().or(z.literal('')),
+    birthDate: z.string().min(1, 'Birth date is required'),
+    maritalStatus: z.string().optional(),
+    educationLevel: z.string().optional(),
+    occupation: z.string().optional(),
+    emergencyContactName: z.string().optional(),
+    emergencyContactPhone: z.string().optional()
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
   });
 
   type SignupFormValues = z.infer<typeof signupSchema>;
@@ -82,21 +119,32 @@ const SignUp = () => {
     defaultValues: {
       nationalNumber: '',
       password: '',
+      confirmPassword: '',
       fullName: '',
       phoneNumber: '',
       gender: '',
       state: '',
       address: '',
-      email: ''
+      email: '',
+      birthDate: '',
+      maritalStatus: '',
+      educationLevel: '',
+      occupation: '',
+      emergencyContactName: '',
+      emergencyContactPhone: ''
     },
   });
 
-  // Redirect if already authenticated
+  // Show logout option if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      toast({
+        title: "Already Logged In",
+        description: "You're currently logged in. Logout first to create a new account.",
+        variant: "default",
+      });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
@@ -114,10 +162,16 @@ const SignUp = () => {
           p_full_name: data.fullName,
           p_phone_number: data.phoneNumber,
           p_password: data.password,
-          p_gender: data.gender || null,
-          p_state: data.state || null,
-          p_address: data.address || null,
-          p_email: data.email || null
+          p_gender: data.gender,
+          p_state: data.state,
+          p_address: data.address,
+          p_email: data.email || null,
+          p_birth_date: data.birthDate,
+          p_marital_status: data.maritalStatus || null,
+          p_education_level: data.educationLevel || null,
+          p_occupation: data.occupation || null,
+          p_emergency_contact_name: data.emergencyContactName || null,
+          p_emergency_contact_phone: data.emergencyContactPhone || null
         })
       });
 
@@ -152,6 +206,33 @@ const SignUp = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-secondary/20">
       <div className="w-full max-w-md">
+        {/* Already Logged In Notice */}
+        {isAuthenticated && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800 text-center mb-3">
+              You're currently logged in. To create a new account, please logout first.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+                className="text-yellow-800 border-yellow-300 hover:bg-yellow-100"
+              >
+                Logout
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="text-yellow-800 border-yellow-300 hover:bg-yellow-100"
+              >
+                Go to Dashboard
+              </Button>
+            </div>
+          </div>
+        )}
+        
         {/* App Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="h-20 w-20 rounded-2xl bg-primary flex items-center justify-center mb-4">
@@ -172,8 +253,9 @@ const SignUp = () => {
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <CardContent>
                 <Tabs defaultValue="basic" className="w-full mb-6">
-                  <TabsList className="grid grid-cols-2 w-full">
+                  <TabsList className="grid grid-cols-3 w-full">
                     <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                    <TabsTrigger value="personal">Personal Details</TabsTrigger>
                     <TabsTrigger value="additional">Additional Info</TabsTrigger>
                   </TabsList>
                   
@@ -237,37 +319,16 @@ const SignUp = () => {
                       
                       <FormField
                         control={form.control}
-                        name="phoneNumber"
+                        name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
+                            <FormLabel>Confirm Password</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
-                                className={form.formState.errors.phoneNumber ? 'border-destructive' : ''}
-                                placeholder="+1234567890"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    {/* Additional Information Tab */}
-                    <div className={form.watch('nationalNumber') ? 'space-y-4' : 'space-y-4'}>
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type="email"
-                                className={form.formState.errors.email ? 'border-destructive' : ''}
-                                placeholder="your.email@example.com"
+                                type="password"
+                                className={form.formState.errors.confirmPassword ? 'border-destructive' : ''}
+                                placeholder="Confirm your password"
                               />
                             </FormControl>
                             <FormMessage />
@@ -277,10 +338,31 @@ const SignUp = () => {
                       
                       <FormField
                         control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className={form.formState.errors.phoneNumber ? 'border-destructive' : ''}
+                                placeholder="+249123456789"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    {/* Personal Details Tab */}
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
                         name="gender"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Gender</FormLabel>
+                            <FormLabel>Gender *</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -290,10 +372,27 @@ const SignUp = () => {
                               <SelectContent>
                                 <SelectItem value="male">Male</SelectItem>
                                 <SelectItem value="female">Female</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                                <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
                               </SelectContent>
                             </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="birthDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Birth Date *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="date"
+                                className={form.formState.errors.birthDate ? 'border-destructive' : ''}
+                                max={new Date().toISOString().split('T')[0]}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -304,7 +403,7 @@ const SignUp = () => {
                         name="state"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>State</FormLabel>
+                            <FormLabel>State *</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
@@ -329,12 +428,145 @@ const SignUp = () => {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address</FormLabel>
+                            <FormLabel>Address *</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 className={form.formState.errors.address ? 'border-destructive' : ''}
-                                placeholder="Enter your address"
+                                placeholder="Enter your full address"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="maritalStatus"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Marital Status</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select marital status" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {maritalStatusOptions.map(status => (
+                                  <SelectItem key={status} value={status}>
+                                    {status}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    {/* Additional Information Tab */}
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email (Optional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="email"
+                                className={form.formState.errors.email ? 'border-destructive' : ''}
+                                placeholder="your.email@example.com"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="educationLevel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Education Level</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select education level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {educationLevelOptions.map(level => (
+                                  <SelectItem key={level} value={level}>
+                                    {level}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="occupation"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Occupation</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select occupation" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {occupationOptions.map(occupation => (
+                                  <SelectItem key={occupation} value={occupation}>
+                                    {occupation}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Emergency Contact Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className={form.formState.errors.emergencyContactName ? 'border-destructive' : ''}
+                                placeholder="Emergency contact full name"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Emergency Contact Phone</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className={form.formState.errors.emergencyContactPhone ? 'border-destructive' : ''}
+                                placeholder="+249123456789"
                               />
                             </FormControl>
                             <FormMessage />
@@ -354,13 +586,15 @@ const SignUp = () => {
                 <Button 
                   type="submit" 
                   className="w-full"
-                  disabled={isLoading}
+                  disabled={isLoading || isAuthenticated}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating Account...
                     </>
+                  ) : isAuthenticated ? (
+                    'Logout to Create New Account'
                   ) : (
                     'Create Account'
                   )}

@@ -38,7 +38,7 @@ export const OfficeSelect: React.FC<OfficeSelectProps> = ({
       <label className="text-sm font-medium">{t('selectOffice')}</label>
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger>
-          <SelectValue placeholder={`${t('selectOffice')}...`} />
+          <SelectValue placeholder={`${t('Select Office')}...`} />
         </SelectTrigger>
         <SelectContent>
           {offices.map(office => (
